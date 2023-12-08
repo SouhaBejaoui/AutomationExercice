@@ -16,6 +16,9 @@ import io.github.bonigarcia.wdm.WebDriverManager;
 public class Register {
 
 	private WebDriver driver;
+	private String username = "admin";
+	private String email = "admin@localhost.dev";
+	private String password = "password";
 	
 	@BeforeSuite	
 	public void launchBrowser() {
@@ -43,9 +46,7 @@ public class Register {
 		WebElement nameInput = driver.findElement(By.xpath("//input[@data-qa = 'signup-name']"));
 		WebElement emailInput = driver.findElement(By.xpath("//input[@data-qa = 'signup-email']"));
 		WebElement signUpButton = driver.findElement(By.xpath("//button[@data-qa = 'signup-button']"));
-        String email = "admin@localhost.dev";
-        String name = "admin";
-        nameInput.sendKeys(name);
+        nameInput.sendKeys(username);
 	    emailInput.sendKeys(email);
 	    signUpButton.click();
 	}
@@ -55,12 +56,12 @@ public class Register {
 		WebElement enterInfoHeader = driver.findElement(By.xpath("//*[contains(text(), 'Enter Account Information')]"));
 	    assertEquals(enterInfoHeader.isDisplayed(), true, "It's not displayed");
 	    WebElement titleRadio = driver.findElement(By.id("id_gender1"));
-	    WebElement password = driver.findElement(By.id("password"));
+	    WebElement passwordInput = driver.findElement(By.id("password"));
         Select selectDay = new Select(driver.findElement(By.id("days")));
         Select selectMonth =new Select(driver.findElement(By.id("months")));
         Select selectYear =new Select(driver.findElement(By.id("years")));
 	    titleRadio.click();
-	    password.sendKeys("password");
+	    passwordInput.sendKeys(password);
         selectDay.selectByValue("5");
         selectMonth.selectByValue("10");
         selectYear.selectByValue("1989");
@@ -107,13 +108,23 @@ public class Register {
 		WebElement continueButton = driver.findElement(By.xpath("//a[@data-qa='continue-button']"));
 		continueButton.click();
 		WebElement loggedAs = driver.findElement(By.xpath("//a[contains(text(), 'Logged in as')]"));
-		System.out.println(loggedAs.getText());
-		
+		//System.out.println(loggedAs.getText());
+		assertEquals(loggedAs.getText(), "Logged in as " + username, "It's not displayed");		
+	}
+	
+	@Test(priority = 7)
+	public void deleteAccount() {
+		WebElement deleteButton = driver.findElement(By.xpath("//a[contains(text(), 'Delete Account')]"));
+		deleteButton.click();
+		WebElement deletedHeader = driver.findElement(By.xpath("//*[contains(text(), 'Account Deleted!')]"));
+		WebElement continueButton = driver.findElement(By.xpath("//*[@data-qa = 'continue-button']"));
+		assertEquals(deletedHeader.isDisplayed(), true, "It's not displayed");
+		continueButton.click();
 	}
 	
 	@AfterSuite
 	public void tearDown() {
-		//driver.quit();
+		driver.quit();
 	}
 
 }
