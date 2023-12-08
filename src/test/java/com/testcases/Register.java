@@ -13,19 +13,11 @@ import org.testng.annotations.Test;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
 
-public class Register {
+public class Register extends Automation {
 
-	private WebDriver driver;
 	private String username = "admin";
 	private String email = "admin@localhost.dev";
 	private String password = "password";
-	
-	@BeforeSuite	
-	public void launchBrowser() {
-		WebDriverManager.chromedriver().setup();
-		driver = new ChromeDriver();
-		driver.manage().window().maximize();
-	}
 	
 	@Test(priority = 0)
 	public void openHome() {
@@ -49,6 +41,12 @@ public class Register {
         nameInput.sendKeys(username);
 	    emailInput.sendKeys(email);
 	    signUpButton.click();
+	}
+	
+	@Test(priority = 3)
+	public void existingEmail() {
+		WebElement registerError = driver.findElement(By.xpath("//p[contains(text(), 'Email Address already exist!')]"));
+    	assertEquals(registerError.isDisplayed(), true, "It's not displayed");
 	}
 	
 	@Test(priority = 3)
@@ -121,10 +119,4 @@ public class Register {
 		assertEquals(deletedHeader.isDisplayed(), true, "It's not displayed");
 		continueButton.click();
 	}
-	
-	@AfterSuite
-	public void tearDown() {
-		driver.quit();
-	}
-
 }

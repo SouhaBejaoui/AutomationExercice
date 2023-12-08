@@ -4,14 +4,10 @@ import static org.testng.Assert.assertEquals;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
 public class Login extends Automation {
-	
-	private String username = "admin";
-	private String email = "admin@localhost.dev";
-	private String password = "password";
-	
 	
 	@Test(priority = 0)
 	public void openHome() {
@@ -27,16 +23,21 @@ public class Login extends Automation {
 		assertEquals(loginHeader.isDisplayed(), true, "It's not displayed");
 	}
 	
+	@Parameters({"email","password", "username", "correctIdentifiers"})
 	@Test(priority = 2)
-	public void login() {
+	public void login(String email, String password, String username, Boolean correctIdentifiers) {
 		WebElement emailInput = driver.findElement(By.name("email"));
 		WebElement passwordInput = driver.findElement(By.name("password"));
 		WebElement loginButton = driver.findElement(By.xpath("//button[@data-qa = 'login-button']"));
 	    emailInput.sendKeys(email);
         passwordInput.sendKeys(password);
 	    loginButton.click();
-		WebElement loggedAs = driver.findElement(By.xpath("//a[contains(text(), 'Logged in as')]"));
-		assertEquals(loggedAs.getText(), "Logged in as " + username, "It's not displayed");	
+	    if (correctIdentifiers) {
+			WebElement loggedAs = driver.findElement(By.xpath("//a[contains(text(), 'Logged in as')]"));
+			assertEquals(loggedAs.getText(), "Logged in as " + username, "It's not displayed");
+	    } else {
+	    	WebElement loginError = driver.findElement(By.xpath("//p[contains(text(), 'Your email or password is incorrect!')]"));
+	    	assertEquals(loginError.isDisplayed(), true, "It's not displayed");
+	    }	
 	}
-
 }
